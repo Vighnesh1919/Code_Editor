@@ -10,10 +10,10 @@ export const syncUser = mutation({
   handler: async (ctx, args) => {
     const existingUser = await ctx.db
       .query("users")
-      .filter((q) => q.eq(q.field("userId"), args.userId))//chekc if user exist
+      .filter((q) => q.eq(q.field("userId"), args.userId))
       .first();
 
-    if (!existingUser) {// is user not existed then created it in database
+    if (!existingUser) {
       await ctx.db.insert("users", {
         userId: args.userId,
         email: args.email,
@@ -33,11 +33,39 @@ export const getUser = query({
     const user = await ctx.db
       .query("users")
       .withIndex("by_user_id")
-      .filter((q) => q.eq(q.field("userId"), args.userId))// finds the user by the user id  
+      .filter((q) => q.eq(q.field("userId"), args.userId))
       .first();
 
     if (!user) return null;
 
     return user;
+  },
+});
+
+
+
+export const upgradeToPro = mutation({
+  args: {
+    email: v.string(),
+    lemonSqueezyCustomerId: v.string(),
+    lemonSqueezyOrderId: v.string(),
+    amount: v.number(),
+  },
+  handler: async (ctx, args) => {
+    const user = await ctx.db
+      .query("users")
+      .filter((q) => q.eq(q.field("email"), args.email))
+      .first();
+
+    if (!user) throw new Error("User not found");
+
+    await ctx.db.patch(user._id, {
+      isPro: true,
+      proSince: Date.now(),
+      lemonSqueezyCustomerId: args.lemonSqueezyCustomerId,
+      lemonSqueezyOrderId: args.lemonSqueezyOrderId,
+    });
+
+    return { success: true };
   },
 });
