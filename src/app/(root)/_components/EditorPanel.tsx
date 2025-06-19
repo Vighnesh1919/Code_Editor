@@ -11,7 +11,6 @@ import { EditorPanelSkeleton } from "./EditorPanelSkeleton";
 import useMounted from "@/hooks/useMounted";
 import ShareSnippetDialog from "./ShareSnippetDialog";
 
-
 function EditorPanel() {
   const clerk = useClerk();
   const [isShareDialogOpen, setIsShareDialogOpen] = useState(false);
@@ -19,24 +18,16 @@ function EditorPanel() {
 
   const mounted = useMounted();
 
-
-
   useEffect(() => {
     const savedCode = localStorage.getItem(`editor-code-${language}`);
     const newCode = savedCode || LANGUAGE_CONFIG[language].defaultCode;
     if (editor) editor.setValue(newCode);
   }, [language, editor]);
 
-
-
-
   useEffect(() => {
     const savedFontSize = localStorage.getItem("editor-font-size");
     if (savedFontSize) setFontSize(parseInt(savedFontSize));
   }, [setFontSize]);
-
-
-
 
   const handleRefresh = () => {
     const defaultCode = LANGUAGE_CONFIG[language].defaultCode;
@@ -44,24 +35,15 @@ function EditorPanel() {
     localStorage.removeItem(`editor-code-${language}`);
   };
 
-
-
-
   const handleEditorChange = (value: string | undefined) => {
     if (value) localStorage.setItem(`editor-code-${language}`, value);
   };
-
-
-
 
   const handleFontSizeChange = (newSize: number) => {
     const size = Math.min(Math.max(newSize, 12), 24);
     setFontSize(size);
     localStorage.setItem("editor-font-size", size.toString());
   };
-
-
-
 
   if (!mounted) return null;
 
@@ -124,7 +106,7 @@ function EditorPanel() {
 
         {/* Editor  */}
         <div className="relative group rounded-xl overflow-hidden ring-1 ring-white/[0.05]">
-          {clerk.loaded && (// onlu when clerk is there
+          {clerk.loaded && (
             <Editor
               height="600px"
               language={LANGUAGE_CONFIG[language].monacoLanguage}
@@ -133,7 +115,7 @@ function EditorPanel() {
               beforeMount={defineMonacoThemes}
               onMount={(editor) => setEditor(editor)}
               options={{
-                minimap: { enabled: true },
+                minimap: { enabled: false },
                 fontSize,
                 automaticLayout: true,
                 scrollBeyondLastLine: false,
